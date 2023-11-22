@@ -16,12 +16,12 @@ class categoryController extends Controller
         $q = Category::query();
 
 
-        if(request()->has('name')){
+        if(request()->has('name'))
             $q->where('name','LIKE',$request->name.'%');
-        }
+
         $categories = $q->get();
         return response()->json([ 'data'=>$categories]);
-     }
+    }
 
 
     /**

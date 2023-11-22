@@ -17,6 +17,13 @@ class Product extends Model
     'categoryId',
     'vendorId'];
 
+    protected $appends=['is_active'];
+
+    public function getIsActiveAttribute()
+    {
+     return $this->quantity !=0;
+    }
+
     public function category()
     {
         return $this->belongsTo(category::class);
