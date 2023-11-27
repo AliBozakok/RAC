@@ -6,11 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\vendorRequest;
 use Illuminate\Http\Request;
 use App\Models\Product;
+use App\Models\Vendor;
+use App\Notifications\ProductQuantityNotification;
+
 class vendorController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+
     public function index()
     {
         $input=product::all();
@@ -24,9 +25,7 @@ class vendorController extends Controller
 
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+
     public function store(vendorRequest $request)
     {
         $input=$request->validated();
@@ -34,18 +33,14 @@ class vendorController extends Controller
         return response()->json(["Message"=>'product is added successfuly']);
     }
 
-    /**
-     * Display the specified resource.
-     */
+
     public function show(string $id)
     {
         $product =product::findOrFail($id);
         return response()->json(["data"=>$product]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
+
     public function update(vendorRequest $request, string $id)
     {
       $input = $request->validated();
@@ -54,13 +49,64 @@ class vendorController extends Controller
       return response()->json(["message"=>"product is updated successfuly"]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
+
     public function destroy(string $id)
     {
         $product =product::findOrFail($id);
         $product->delete();
         return response()->json(["Message"=>'product is deleted successfuly']);
     }
+    public function __construct()
+    {
+        $this->middleware('auth:api', ['except' => ['login']]);
+    }
+
+
+    public function login()
+    {
+        $credentials = request(['email', 'password']);
+
+        if (! $token = auth()->attempt($credentials)) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        return $this->respondWithToken($token);
+    }
+
+    public function me()
+    {
+        return response()->json(auth('vendor')->user());
+    }
+
+
+    public function logout()
+    {
+        auth('vendor')->logout();
+
+        return response()->json(['message' => 'Successfully logged out']);
+    }
+
+
+    protected function respondWithToken($token)
+    {
+        return response()->json([
+            'access_token' => $token,
+            'token_type' => 'bearer',
+            'expires_in' => auth('vendor')->factory()->getTTL() * 60
+        ]);
+    }
+
+  /*  public function sendNotification(string $productId)
+   {
+    $product = product::findOrFail($productId);
+
+    if ($product->quantity == 2) {
+        $vendor = Vendor::findOrFail($product->vendor_id);
+        $vendor->notify(new ProductQuantityNotification($product));
+    }
+
+    return response()->json(['message' => 'Notification sent successfully']);
+
+    }*/
+
 }

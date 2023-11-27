@@ -3,47 +3,79 @@
 namespace App\Http\Controllers\Admin\User;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\Hash;
 class userController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+
+
+    public function Registeration(Request $request)
     {
-        //
+         //validation
+        $input= $request->validate(['name'=>['required']
+        ,'email'=>['required'],'password'=>['required']]);
+         // chagne the password to hash::make
+         $input['password']=hash::make('pasword');
+        $user= User::where('email',$request->email)->first();
+        if(!$user){
+            User::create($request->all());
+            return response()->json(['message'=>'Registeration is added successfully' ]) ;
+        }
+        return response()->json(['message'=>'user is found' ]) ;
+    }
+
+
+    public function __construct()
+    {
+        $this->middleware('auth:api', ['except' => ['login','Registeration']]);
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Get a JWT via given credentials.
+     *
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function store(Request $request)
+    public function login()
     {
-        //
+        $credentials = request(['email', 'password']);
+
+        if (! $token = auth('user')->attempt($credentials)) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        return $this->respondWithToken($token);
     }
 
     /**
-     * Display the specified resource.
+     * Get the authenticated User.
+     *
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function show(string $id)
+    public function me()
     {
-        //
+        return response()->json(auth('user')->user());
     }
 
     /**
-     * Update the specified resource in storage.
+     * Log the user out (Invalidate the token).
+     *
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function update(Request $request, string $id)
+    public function logout()
     {
-        //
+        auth('user')->logout();
+
+        return response()->json(['message' => 'Successfully logged out']);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+
+    protected function respondWithToken($token)
     {
-        //
+        return response()->json([
+            'access_token' => $token,
+            'token_type' => 'bearer',
+            'expires_in' => auth('user')->factory()->getTTL() * 60
+        ]);
     }
 }

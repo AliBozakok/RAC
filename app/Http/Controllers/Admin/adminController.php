@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Admin;
 use App\Models\Vendor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -23,8 +24,9 @@ class adminController extends Controller
         $input=$request->validate([
             'name'=>['require'],
             'email'=>['required'],
-            'password'=>['required',Hash::make('password')],
+            'password'=>['required']
         ]);
+        $input['password']=Hash::make('pasword');
         Vendor::create($input);
         return response()->json(["message"=>"vendor is added successfuly"]);
     }
@@ -42,8 +44,9 @@ class adminController extends Controller
         $input=$request->validate([
             'name'=>['require'],
             'email'=>['required'],
-            'password'=>['required',Hash::make('password')],
+            'password'=>['required'],
         ]);
+        $input['password']=Hash::make('pasword');
         $vendor=Vendor::findOrFail($id);
         $vendor->update($input);
         return response()->json(["message"=>"vendor is updated successfuly"]);
@@ -55,5 +58,73 @@ class adminController extends Controller
         $vendor=Vendor::findOrFail($id);
         $vendor->delete();
         return response()->json(["message"=>"vendor is deleted successfuly"]);
+    }
+    public function Registeration(Request $request)
+    {
+         //validation
+        $input= $request->validate(['name'=>['required']
+        ,'email'=>['required'],'password'=>['required']]);
+         // chagne the password to hash::make
+         $input['password']=Hash::make('pasword');
+        $user= Admin::where('email',$request->email)->first();
+        if(!$user){
+            Admin::create($request->all());
+            return response()->json(['message'=>'Registeration is added successfully' ]) ;
+        }
+        return response()->json(['message'=>'user is found' ]) ;
+    }
+
+
+    public function __construct()
+    {
+        $this->middleware('auth:api', ['except' => ['login','Registeration']]);
+    }
+
+    /**
+     * Get a JWT via given credentials.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function login()
+    {
+        $credentials = request(['email', 'password']);
+
+        if (! $token = auth('admin')->attempt($credentials)) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        return $this->respondWithToken($token);
+    }
+
+    /**
+     * Get the authenticated User.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function me()
+    {
+        return response()->json(auth('admin')->user());
+    }
+
+    /**
+     * Log the user out (Invalidate the token).
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function logout()
+    {
+        auth('admin')->logout();
+
+        return response()->json(['message' => 'Successfully logged out']);
+    }
+
+
+    protected function respondWithToken($token)
+    {
+        return response()->json([
+            'access_token' => $token,
+            'token_type' => 'bearer',
+            'expires_in' => auth('admin')->factory()->getTTL() * 60
+        ]);
     }
 }
