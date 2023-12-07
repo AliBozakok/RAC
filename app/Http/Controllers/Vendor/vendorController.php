@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Vendor;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\vendorRequest;
@@ -20,7 +20,7 @@ class vendorController extends Controller
 
     public function showByCategory($category)
     {
-     $products= product::where('category_id',$category)->get()->load('category');
+     $products= product::where('categoryId',$category)->get()->load('category');
      return response()->json(['data'=>$products]);
 
     }
@@ -58,7 +58,7 @@ class vendorController extends Controller
     }
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login']]);
+        $this->middleware('auth:vendor', ['except' => ['login']]);
     }
 
 
@@ -66,7 +66,7 @@ class vendorController extends Controller
     {
         $credentials = request(['email', 'password']);
 
-        if (! $token = auth()->attempt($credentials)) {
+        if (! $token = auth('vendor')->attempt($credentials)) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
@@ -78,13 +78,6 @@ class vendorController extends Controller
         return response()->json(auth('vendor')->user());
     }
 
-
-    public function logout()
-    {
-        auth('vendor')->logout();
-
-        return response()->json(['message' => 'Successfully logged out']);
-    }
 
 
     protected function respondWithToken($token)

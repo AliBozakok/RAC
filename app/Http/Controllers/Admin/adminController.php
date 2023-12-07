@@ -22,11 +22,10 @@ class adminController extends Controller
     public function store(Request $request)
     {  //add new vendor
         $input=$request->validate([
-            'name'=>['require'],
-            'email'=>['required'],
-            'password'=>['required']
+            'name'=>'required',
+            'email'=>'required',
+            'password'=>'required'
         ]);
-        $input['password']=Hash::make('pasword');
         Vendor::create($input);
         return response()->json(["message"=>"vendor is added successfuly"]);
     }
@@ -42,11 +41,10 @@ class adminController extends Controller
     public function update(Request $request, string $id)
     { //update vendor
         $input=$request->validate([
-            'name'=>['require'],
-            'email'=>['required'],
-            'password'=>['required'],
+            'name'=>'required',
+            'email'=>'required',
+            'password'=>'required',
         ]);
-        $input['password']=Hash::make('pasword');
         $vendor=Vendor::findOrFail($id);
         $vendor->update($input);
         return response()->json(["message"=>"vendor is updated successfuly"]);
@@ -63,12 +61,11 @@ class adminController extends Controller
     {
          //validation
         $input= $request->validate(['name'=>['required']
-        ,'email'=>['required'],'password'=>['required']]);
+        ,'email'=>['required'],'phoneNumber'=>['required'],'password'=>['required']]);
          // chagne the password to hash::make
-         $input['password']=Hash::make('pasword');
         $user= Admin::where('email',$request->email)->first();
         if(!$user){
-            Admin::create($request->all());
+            Admin::create($input);
             return response()->json(['message'=>'Registeration is added successfully' ]) ;
         }
         return response()->json(['message'=>'user is found' ]) ;
@@ -77,7 +74,7 @@ class adminController extends Controller
 
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login','Registeration']]);
+        $this->middleware('auth:admin', ['except' => ['login','Registeration']]);
     }
 
     /**
@@ -111,12 +108,6 @@ class adminController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function logout()
-    {
-        auth('admin')->logout();
-
-        return response()->json(['message' => 'Successfully logged out']);
-    }
 
 
     protected function respondWithToken($token)

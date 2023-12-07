@@ -18,8 +18,7 @@ return new class extends Migration
             $table->text("description");
             $table->double("price",10,2);
             $table->integer("quantityInStock")->default(0);
-            $table->integer("vendorID");
-            $table->integer("productID");
+            $table->integer("categoryId");
             $table->timestamps();
         });
     }

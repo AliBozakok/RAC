@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Admin\User;
+namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
@@ -14,9 +14,7 @@ class userController extends Controller
     {
          //validation
         $input= $request->validate(['name'=>['required']
-        ,'email'=>['required'],'password'=>['required']]);
-         // chagne the password to hash::make
-         $input['password']=hash::make('pasword');
+        ,'email'=>['required'],'password'=>['required'],'imgUrl'=>['required']]);
         $user= User::where('email',$request->email)->first();
         if(!$user){
             User::create($request->all());
@@ -28,7 +26,7 @@ class userController extends Controller
 
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login','Registeration']]);
+        $this->middleware('auth:user', ['except' => ['login','Registeration']]);
     }
 
     /**

@@ -4,19 +4,28 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Product;
-class productsOfUserController extends Controller
+
+class productsController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         // show all active products
-        $products = Product::getActive()->get();
+     /*   $products = Product::getActive()->get();
 
         return response()->json([
             'data'=>$products
-        ]);
+        ]);*/
+        $q = Product::query();
+
+
+        if(request()->has('title'))
+            $q->where('title','LIKE',$request->title.'%');
+
+        $products = $q->get();
+        return response()->json([ 'data'=>$products]);
     }
 
 

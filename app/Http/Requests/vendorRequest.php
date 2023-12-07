@@ -11,7 +11,7 @@ class vendorRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,14 +22,12 @@ class vendorRequest extends FormRequest
     public function rules(): array
     {
         return [
-    'tilte'=>['required'],
-    'description'=>['nullable'],
-    'imageUrl'=>['required'],
-    'price'=>['required'],
-    'quantityInStock'=>['required'],
-    'categoryId'=>['required'],
-    'vendorId'=> auth()->id()
-
-        ];
+    'title'=>'required',
+    'description'=>'nullable',
+    'imageUrl'=>'required',
+    'price'=>'required',
+    'quantityInStock'=>'required',
+    'categoryId'=>'required',
+             ];
     }
 }

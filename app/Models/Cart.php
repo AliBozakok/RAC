@@ -14,14 +14,13 @@ class Cart extends Model
         "qty"
     ];
 
-    public function product ()
+    public function product()
     {
         return $this->belongsTo(Product::class);
     }
+   protected $appends = ['total'];
 
-    protected $appends=[ "total"];
-
-    public function getTotalAttirbute()
+    public function getTotalAttribute()
     {
         return $this->qty * $this->product->price;
     }

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Admin\User;
+namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\orderResource;
@@ -15,7 +15,7 @@ class orderController extends Controller
      */
     public function index()
     {
-        $orders = Order::where('user_id',auth()->id())->with('OrderItem.Product')->get();
+        $orders = Order::where('userId',auth()->id())->with('OrderItem.Product')->get();
         return orderResource::collection($orders);
     }
 
@@ -26,7 +26,7 @@ class orderController extends Controller
     {
         $input  = $request->validate([
             'address' => 'required',
-            'phone_number' => 'required',
+            'phoneNumber' => 'required',
         ]);
 
 
@@ -38,13 +38,13 @@ class orderController extends Controller
             $orderId = $orderId->id +1;
         }
 
-        $cartItems = Cart::where('user_id',auth()->id())->get();
+        $cartItems = Cart::where('userId',auth()->id())->get();
 
         $orderTotal = 0;
         foreach($cartItems as $item){
             OrderItem::create([
-                'order_id'=>$orderId,
-                'product_id'=>$item->product_id,
+                'orderId'=>$orderId,
+                'productId'=>$item->productId,
                 'qty'=>$item->qty
             ]);
             $item->decrease();
@@ -53,10 +53,10 @@ class orderController extends Controller
         }
 
         Order::create([
-            'user_id'=>auth()->id(),
+            'userId'=>auth()->id(),
             'total' => $orderTotal,
             'address' => $input['address'],
-            'phone_number' =>$input['phone_number']
+            'phoneNumber' =>$input['phoneNumber']
         ]);
 
         return response()->json([

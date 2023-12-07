@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Admin\User;
+namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use App\Models\Cart;
@@ -11,9 +11,11 @@ class cartController extends Controller
 
     public function index()
     {
+
         //show user cart
-       $cartItem= Cart::where('userId',auth()->id())->get();
-       return cartResource::collection($cartItem);
+      $cartItem= Cart::where('userId',auth()->id())->get();
+      dd($cartItem);
+      return cartResource::collection($cartItem);
     }
 
     /**
@@ -23,15 +25,15 @@ class cartController extends Controller
     {
           // store products in user cart
         $input = $request->validate([
-            'product_id'=>'required',
+            'productId'=>'required',
             'qty'=>['nullable','numeric']
         ]);
 
-        $item = Cart::where('product_id',$input['product_id'])
-        ->where('user_id',auth()->id())->first();
+        $item = Cart::where('productId',$input['productId'])
+        ->where('userId',auth()->id())->first();
 
         if(!$item){
-            $input['user_id'] = auth()->id();
+            $input['userId'] = auth()->id();
             Cart::create($input);
             return response()->json([
                 'message'=>'item added'
@@ -59,8 +61,8 @@ class cartController extends Controller
             'qty'=>['required','numeric']
         ]);
 
-        $item = Cart::where('product_id',$id)
-        ->where('user_id',auth()->id())->firstOrFail();
+        $item = Cart::where('productId',$id)
+        ->where('userId',auth()->id())->firstOrFail();
 
         $cartQty = $item->qty + $request->qty;
 
@@ -84,8 +86,8 @@ class cartController extends Controller
             'qty'=>['required','numeric']
         ]);
 
-        $item = Cart::where('product_id',$id)
-        ->where('user_id',auth()->id())->firstOrFail();
+        $item = Cart::where('productId',$id)
+        ->where('userId',auth()->id())->firstOrFail();
 
         $cartQty = $item->qty - $request->qty;
 
@@ -106,8 +108,8 @@ class cartController extends Controller
 
     public function destroy(string $id)
     {   // delete product from user cart
-        $item = Cart::where('product_id',$id)
-        ->where('user_id',auth()->id())->firstOrFail();
+        $item = Cart::where('productId',$id)
+        ->where('userId',auth()->id())->firstOrFail();
         $item->delete();
         return response()->json([
             'message'=>'item deleted'

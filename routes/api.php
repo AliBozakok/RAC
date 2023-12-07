@@ -1,11 +1,12 @@
 <?php
 
 use App\Http\Controllers\Admin\adminController;
-use App\Http\Controllers\Admin\categoryController;
-use App\Http\Controllers\Admin\User\orderController;
-use App\Http\Controllers\Admin\User\userController;
-use App\Http\Controllers\Admin\vendorController;
-use App\Http\Controllers\productsOfUserController;
+use App\Http\Controllers\Vendor\categoryController;
+use App\Http\Controllers\User\orderController;
+use App\Http\Controllers\User\userController;
+use App\Http\Controllers\Vendor\vendorController;
+use App\Http\Controllers\ProductsController;
+use App\Http\Controllers\User\cartController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -23,52 +24,35 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
-Route::post('AdminRegisteration',[adminController::class,'Registeration']);
-Route::group([
+Route::post('AdminRegisteration', [AdminController::class, 'Registeration']);
+Route::post('Adminlogin', [AdminController::class, 'login']);
 
-    'middleware' => 'api',
-    'prefix' => 'admin'
-
-], function ($router) {
-
-    Route::post('login', [adminController::class,'login']);
-    Route::post('logout',[adminController::class,'logout']);
-    Route::get('me', [adminController::class,'me']);
-    Route::apiResource('admin',adminController::class);
-
+Route::group(['middleware' => 'auth:admin'], function () {
+    Route::get('me', [AdminController::class, 'me']);
+    Route::apiResource('vendorControl', AdminController::class);
 });
 
-Route::group([
 
-    'middleware' => 'api',
-    'prefix' => 'vendor'
+Route::post('Vendorlogin', [vendorController::class, 'login']);
 
-], function ($router) {
+Route::group(['middleware' => 'auth:vendor'], function () {
 
-    Route::post('login', [vendorController::class,'login']);
-    Route::post('logout', [vendorController::class,'logout']);
-    Route::get('me', [vendorController::class,'me']);
-    Route::apiResource('vendor',vendorController::class);
-    Route::get('category/{categoryId}/product',[vendorController::class,'showByCategory']);
-    Route::apiResource('category',categoryController::class);
-    Route::post('vendor/products/{id}/send-notification', [vendorController::class, 'sendNotification']);
-
+    Route::get('me', [VendorController::class, 'me']);
+    Route::apiResource('vendor', VendorController::class);
+    Route::get('category/{categoryId}/product', [VendorController::class, 'showByCategory']);
+    Route::apiResource('category', CategoryController::class);
+    //Route::post('vendor/products/{id}/send-notification',[vendorController::class, 'sendNotification']);
 });
 
-Route::post('UserRegisteration',[userController::class,'Registeration']);
-Route::group([
+Route::post('UserRegister', [UserController::class, 'Registeration']);
+Route::apiResource('products', ProductsController::class)->only(['index', 'show']);
 
-    'middleware' => 'api',
-    'prefix' => 'user'
+Route::post('userLogin', [UserController::class, 'login']);
+Route::group(['middleware' => 'auth:user'], function () {
 
-], function ($router) {
-
-    Route::post('login', [userController::class,'login']);
-    Route::post('logout', [userController::class,'logout']);
-    Route::get('me', [userController::class,'me']);
-    Route::apiResource('cart',cartController::class);
-    Route::apiResource('cart',[cartController::class,'remove']);
-    Route::apiResource('products',productsOfUserController::class)->only(['index','show']);
-    Route::apiResource('order',orderController::class)->only(['index','store']);
+    Route::get('userProfile', [UserController::class, 'me']);
+    Route::apiResource('user/cart', CartController::class);
+    Route::put('user/cart/{productId}', [CartController::class, 'remove']);
+    Route::apiResource('user/order', OrderController::class)->only(['index', 'store']);
 });
 

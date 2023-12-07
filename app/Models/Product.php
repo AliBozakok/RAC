@@ -15,7 +15,7 @@ class Product extends Model
     'price',
     'quantityInStock',
     'categoryId',
-    'vendorId'];
+    ];
 
     protected $appends=['is_active'];
 
@@ -26,18 +26,26 @@ class Product extends Model
 
     public function category()
     {
-        return $this->belongsTo(category::class);
+        return $this->belongsTo(Category::class);
     }
 
-    public function vendor()
+    /*public function carts()
+    {
+        return $this->hasMany(Cart::class);
+    }
+   /* public function vendor()
     {
         return $this->belongsTo(Vendor::class);
-    }
+    }*/
 
     public function notification()
     {
         if($this->quantityInStock<2)
         return response()->json(["message"=>"the product".$this->title." is out of stock"]);
+    }
+    public function scopeGetActive()
+    {
+        return $this->where('quantityInStock','!=',0);
     }
 
 }
