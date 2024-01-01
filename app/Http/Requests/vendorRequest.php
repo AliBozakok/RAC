@@ -22,12 +22,16 @@ class vendorRequest extends FormRequest
     public function rules(): array
     {
         return [
-    'title'=>'required',
-    'description'=>'nullable',
-    'imageUrl'=>'required',
-    'price'=>'required',
-    'quantityInStock'=>'required',
-    'categoryId'=>'required',
+               'title'=>'required',
+                'description'=>'nullable',
+                'imageUrl1'=>'required',
+                'imageUrl2'=>'nullable',
+                'imageUrl3'=>'nullable',
+                'imageUrl4'=>'nullable',
+                'imageUrl5'=>'nullable',
+                'price'=>'required',
+                'quantityInStock'=>'required',
+                'categoryId'=>'required',
              ];
     }
 }

@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Product;
-
+use App\Models\Order;
 class productsController extends Controller
 {
     /**
@@ -36,5 +36,15 @@ class productsController extends Controller
         return response()->json(['data'=>$product]);
     }
 
+    public function recent()
+    {
+        // show all active products
+       $products = Product::getActive()->orderby('created_at','desc')->get();
+
+        return response()->json([
+            'data'=>$products
+        ]);
+
+    }
 
 }

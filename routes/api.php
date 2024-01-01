@@ -7,6 +7,7 @@ use App\Http\Controllers\User\userController;
 use App\Http\Controllers\Vendor\vendorController;
 use App\Http\Controllers\ProductsController;
 use App\Http\Controllers\User\cartController;
+use App\Http\Controllers\Vendor\advertismentsController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -41,18 +42,23 @@ Route::group(['middleware' => 'auth:vendor'], function () {
     Route::apiResource('vendor', VendorController::class);
     Route::get('category/{categoryId}/product', [VendorController::class, 'showByCategory']);
     Route::apiResource('category', CategoryController::class);
+    Route::apiResource('advertisments', advertismentsController::class);
     //Route::post('vendor/products/{id}/send-notification',[vendorController::class, 'sendNotification']);
 });
 
 Route::post('UserRegister', [UserController::class, 'Registeration']);
 Route::apiResource('products', ProductsController::class)->only(['index', 'show']);
-
+Route::get('recent',[productsController::class,'recent']);
+Route::post('forgotPassword', [UserController::class, 'forgotPassword']);
+Route::post('resetPassword', [UserController::class, 'resetPassword']);
 Route::post('userLogin', [UserController::class, 'login']);
 Route::group(['middleware' => 'auth:user'], function () {
 
     Route::get('userProfile', [UserController::class, 'me']);
+    Route::get('user/logout', [UserController::class, 'logout']);
     Route::apiResource('user/cart', CartController::class);
     Route::put('user/cart/{productId}', [CartController::class, 'remove']);
     Route::apiResource('user/order', OrderController::class)->only(['index', 'store']);
+
 });
 

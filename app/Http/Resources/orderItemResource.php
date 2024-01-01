@@ -17,7 +17,7 @@ class orderItemResource extends JsonResource
         return[
             'id'=>$this->id,
             'cart_qty'=>$this->qty,
-            'product'=>$this->product,
+            'productName'=>$this->product->name,
         ];
 }
 }

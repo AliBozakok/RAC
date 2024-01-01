@@ -16,7 +16,7 @@ class orderResource extends JsonResource
     {
         return [
             'user' => $this->user,
-            'order_items' => OrderItemResource::collection($this->orderItems),
+            'order_items' => OrderItemResource::collection($this->orderItem),
             'total'=>$this->total
         ];
     }

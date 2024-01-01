@@ -14,7 +14,7 @@ class cartController extends Controller
 
         //show user cart
       $cartItem= Cart::where('userId',auth()->id())->get();
-      dd($cartItem);
+
       return cartResource::collection($cartItem);
     }
 

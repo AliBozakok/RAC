@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password;
+use App\Models\Order;
 class userController extends Controller
 {
 
@@ -14,7 +16,7 @@ class userController extends Controller
     {
          //validation
         $input= $request->validate(['name'=>['required']
-        ,'email'=>['required'],'password'=>['required'],'imgUrl'=>['required']]);
+        ,'email'=>['required'],'password'=>['required'],'imageUrl'=>['required']]);
         $user= User::where('email',$request->email)->first();
         if(!$user){
             User::create($request->all());
@@ -26,7 +28,7 @@ class userController extends Controller
 
     public function __construct()
     {
-        $this->middleware('auth:user', ['except' => ['login','Registeration']]);
+        $this->middleware('auth:user', ['except' => ['login','Registeration','forgotPassword','resetPassword']]);
     }
 
     /**
@@ -76,4 +78,40 @@ class userController extends Controller
             'expires_in' => auth('user')->factory()->getTTL() * 60
         ]);
     }
+    public function forgotPassword(Request $request)
+  {
+            $request->validate(['email' => 'required|email']);
+
+            $otp = rand(1000,9999);
+            $user = User::where('email', $request->email)->first();
+            $user->otp = $otp;
+            $user->save();
+
+             return response()->json([ 'status' => 'success' , 'otp' => $otp ]);
+}
+
+public function resetPassword(Request $request) {
+
+    // Validate OTP
+
+
+           $user = User::where('email', $request->email)
+                 ->where('otp', $request->otp)
+                 ->first();
+
+    // Reset password
+
+            $user->password = Hash::make($request->newPassword);
+            $user->save();
+
+    // Clear OTP
+
+            $user->otp = null;
+            $user->save();
+
+            return response()->json(['status' => 'success']);
+
+  }
+
+
 }
