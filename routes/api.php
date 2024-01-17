@@ -29,7 +29,8 @@ Route::post('AdminRegisteration', [AdminController::class, 'Registeration']);
 Route::post('Adminlogin', [AdminController::class, 'login']);
 
 Route::group(['middleware' => 'auth:admin'], function () {
-    Route::get('me', [AdminController::class, 'me']);
+    Route::get('admin/profile', [AdminController::class, 'me']);
+    Route::get('admin/logout', [AdminController::class, 'logout']);
     Route::apiResource('vendorControl', AdminController::class);
 });
 
@@ -38,7 +39,8 @@ Route::post('Vendorlogin', [vendorController::class, 'login']);
 
 Route::group(['middleware' => 'auth:vendor'], function () {
 
-    Route::get('me', [VendorController::class, 'me']);
+    Route::get('vendor/profile', [VendorController::class, 'me']);
+    Route::get('vendor/logout', [UserController::class, 'logout']);
     Route::apiResource('vendor', VendorController::class);
     Route::get('category/{categoryId}/product', [VendorController::class, 'showByCategory']);
     Route::apiResource('category', CategoryController::class);
@@ -52,6 +54,7 @@ Route::get('recent',[productsController::class,'recent']);
 Route::post('forgotPassword', [UserController::class, 'forgotPassword']);
 Route::post('resetPassword', [UserController::class, 'resetPassword']);
 Route::post('userLogin', [UserController::class, 'login']);
+
 Route::group(['middleware' => 'auth:user'], function () {
 
     Route::get('userProfile', [UserController::class, 'me']);

@@ -79,6 +79,13 @@ class vendorController extends Controller
     }
 
 
+    public function logout()
+    {
+        auth('vendor')->logout();
+
+        return response()->json(['message' => 'Successfully logged out']);
+    }
+
 
     protected function respondWithToken($token)
     {

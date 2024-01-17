@@ -93,6 +93,12 @@ class adminController extends Controller
         return $this->respondWithToken($token);
     }
 
+    public function logout()
+    {
+        auth('admin')->logout();
+
+        return response()->json(['message' => 'Successfully logged out']);
+    }
     /**
      * Get the authenticated User.
      *
