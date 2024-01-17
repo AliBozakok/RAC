@@ -41,7 +41,7 @@ Route::group(['middleware' => 'auth:vendor'], function () {
 
     Route::get('vendor/profile', [VendorController::class, 'me']);
     Route::get('vendor/logout', [UserController::class, 'logout']);
-    Route::apiResource('vendor', VendorController::class);
+    Route::apiResource('vendor/product', VendorController::class);
     Route::get('category/{categoryId}/product', [VendorController::class, 'showByCategory']);
     Route::apiResource('category', CategoryController::class);
     Route::apiResource('advertisments', advertismentsController::class);
